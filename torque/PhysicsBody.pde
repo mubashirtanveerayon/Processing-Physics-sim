@@ -1,9 +1,9 @@
-float g=1, G=5, density=4;
+float g=5, G=5, density=4, maxVel=18;
 
 class PhysicsBody {
 
-  PVector position, velocity, acceleration;
-  float radius, mass;
+  PVector position, velocity, acceleration,angularAcceleration,angularVelocity;
+  float radius, mass, angle,inertia;
 
   color c;
 
@@ -13,13 +13,21 @@ class PhysicsBody {
     position = pos.copy();
     velocity = new PVector();
     acceleration = new PVector();
+    angularVelocity = new PVector();
+    angularAcceleration = new PVector();
+    inertia = 0.5 * mass * pow(radius, 2);
     c = color(random(255), random(255), random(255));
   }
 
   void draw() {
+   push();
+   translate(position.x,position.y);
+   rotate(angle);
     fill(c);
-    noStroke();
-    circle(position.x, position.y, radius * 2);
+    circle(0, 0, radius * 2);
+    line(-radius, 0, radius, 0);
+    pop();
+    //line(0, -radius, 0, radius);
   }
 
   void attract(PhysicsBody pBody) {
@@ -33,49 +41,44 @@ class PhysicsBody {
   void update() {
     velocity.add(acceleration);
     position.add(velocity);
+    angle += angularVelocity.z;
+    angularVelocity.add(angularAcceleration);
+    angularAcceleration.mult(0);
     acceleration.mult(0);
-    velocity.limit(18);
-}
+    velocity.setMag(min(velocity.mag(), maxVel));
+  }
 
   void applyLinearImpulse(PVector force) {
     acceleration.add(force.div(mass));
   }
 
-  // this will not cause the object to rotate on its own axis
-  void applyLinearImpulse(PVector point, PVector force) {
-
-    pushMatrix();
-    translate(position.x, position.y);
-    if (dist(position.x, position.y, point.x, point.y)>radius ) {
-      return;
-    }
-    PVector f = PVector.fromAngle(atan(position.y-point.y/position.x-point.x));
-    f.setMag(force.mag());
-    popMatrix();
-    print(f.mag());
-    applyLinearImpulse(f);
-  }
+  void applyTorque(float angle, PVector force) {
+    push();
+    translate(position.x,position.y);
+    PVector r = PVector.fromAngle(angle).mult(radius);
+    PVector torque = r.cross(force);
+    angularAcceleration.add(torque.div(inertia));
+    pop();
+ }
 
   void gravity() {
-
     applyLinearImpulse(new PVector(0, g));
   }
 
   void collideWithWalls() {
     if (position.x + radius >= width) {
-      velocity.x *= -1;
+      velocity.x = -1*abs(velocity.x);
       position.x = width - radius;
     } else if ( position.x - radius <= 0) {
-      velocity.x *= -1;
+      velocity.x = abs(velocity.x);
       position.x = radius;
     }
     if (position.y - radius  <= 0 ) {
-      velocity.y *= -1;
+      velocity.y = abs(velocity.y);
       position.y = radius ;
     } else if (position.y + radius >= height) {
-      velocity.y *= -1;
+      velocity.y = -1*abs(velocity.y);
       position.y = height - radius;
     }
   }
-
 }

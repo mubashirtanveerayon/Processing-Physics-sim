@@ -1,4 +1,4 @@
-float g=1, G=5, density=4;
+float g=5.5, G=5, density=4,constrainMin=10,constrainMax=60,maxVel=18;
 
 class PhysicsBody {
 
@@ -6,9 +6,12 @@ class PhysicsBody {
   float radius, mass;
 
   color c;
+  
+  int id;
 
-  PhysicsBody(float m, PVector pos) {
-    radius = m/density; // not an actual formula, just to simplify the calculation
+  PhysicsBody(float m, PVector pos,int i) {
+    id = i;
+    radius = m/density; // not an actual formula, just to simplify the calculation & relating the two values
     mass = m;
     position = pos.copy();
     velocity = new PVector();
@@ -20,11 +23,14 @@ class PhysicsBody {
     fill(c);
     noStroke();
     circle(position.x, position.y, radius * 2);
+    stroke(0);
+    fill(0);
+    text(id,position.x,position.y);
   }
 
   void attract(PhysicsBody pBody) {
     PVector r = PVector.sub(position, pBody.position);
-    float d = constrain(r.mag(), 10, 60);
+    float d = constrain(r.mag(),constrainMin,constrainMax);
     PVector force = r.normalize();
     force.mult(G * mass * pBody.mass/pow(d, 2));
     pBody.applyLinearImpulse(force);
@@ -34,27 +40,13 @@ class PhysicsBody {
     velocity.add(acceleration);
     position.add(velocity);
     acceleration.mult(0);
-    velocity.limit(18);
+    velocity.setMag(min(velocity.mag(),maxVel));
 }
 
   void applyLinearImpulse(PVector force) {
     acceleration.add(force.div(mass));
   }
 
-  // this will not cause the object to rotate on its own axis
-  void applyLinearImpulse(PVector point, PVector force) {
-
-    pushMatrix();
-    translate(position.x, position.y);
-    if (dist(position.x, position.y, point.x, point.y)>radius ) {
-      return;
-    }
-    PVector f = PVector.fromAngle(atan(position.y-point.y/position.x-point.x));
-    f.setMag(force.mag());
-    popMatrix();
-    print(f.mag());
-    applyLinearImpulse(f);
-  }
 
   void gravity() {
 
@@ -63,19 +55,33 @@ class PhysicsBody {
 
   void collideWithWalls() {
     if (position.x + radius >= width) {
-      velocity.x *= -1;
+      velocity.x = -1*abs(velocity.x);
       position.x = width - radius;
     } else if ( position.x - radius <= 0) {
-      velocity.x *= -1;
+      velocity.x = abs(velocity.x);
       position.x = radius;
     }
     if (position.y - radius  <= 0 ) {
-      velocity.y *= -1;
+      velocity.y = abs(velocity.y);
       position.y = radius ;
     } else if (position.y + radius >= height) {
-      velocity.y *= -1;
+      velocity.y = -1*abs(velocity.y);
       position.y = height - radius;
     }
   }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 
 }

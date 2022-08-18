@@ -1,4 +1,4 @@
-float g=5, G=5, density=4;
+float g=5, G=5, density=4,maxVel=18;
 
 class PhysicsBody {
 
@@ -34,6 +34,7 @@ class PhysicsBody {
     velocity.add(acceleration);
     position.add(velocity);
     acceleration.mult(0);
+    velocity.setMag(min(velocity.mag(),maxVel));
 }
 
   void applyLinearImpulse(PVector force) {

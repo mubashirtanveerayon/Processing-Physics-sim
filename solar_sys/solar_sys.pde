@@ -8,7 +8,7 @@ void setup() {
   planets = new ArrayList<Planet>();
   for (int i=0; i<numPlanets; i++) {
     Planet p = new Planet(random(sun.mass), sun.generatePositionForMoon(), (int)random(2));
-    p.applyLinearImpulse(new PVector(25,00));
+    p.applyLinearImpulse(new PVector(200,-150));
     planets.add(p);
   }
 }
