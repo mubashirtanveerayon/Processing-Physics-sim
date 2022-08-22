@@ -1,23 +1,22 @@
-float g=5.5, G=5, density=4,constrainMin=10,constrainMax=60,maxVel=18;
+float g=5.5, G=5, density=4,constrainMin=10,constrainMax=60,maxVel=18,minMass = 30,maxMass = 300;
 
 class PhysicsBody {
 
   PVector position, velocity, acceleration;
-  float radius, mass;
+  float radius, mass,bouncyness;
 
   color c;
   
-  int id;
-
-  PhysicsBody(float m, PVector pos,int i) {
-    id = i;
-    radius = m/density; // not an actual formula, just to simplify the calculation & relating the two values
-    mass = m;
+  PhysicsBody(float m, PVector pos) {
+    mass = constrain(m,minMass,maxMass);
+    radius = mass/density; // not an actual formula, just relating the two values
+    bouncyness = 100;//maxMass - mass; // some arbitrary relation
     position = pos.copy();
     velocity = new PVector();
     acceleration = new PVector();
     c = color(random(255), random(255), random(255));
   }
+  
 
   void draw() {
     fill(c);
@@ -25,7 +24,6 @@ class PhysicsBody {
     circle(position.x, position.y, radius * 2);
     stroke(0);
     fill(0);
-    text(id,position.x,position.y);
   }
 
   void attract(PhysicsBody pBody) {
@@ -40,7 +38,7 @@ class PhysicsBody {
     velocity.add(acceleration);
     position.add(velocity);
     acceleration.mult(0);
-    velocity.setMag(min(velocity.mag(),maxVel));
+    velocity.limit(maxVel);
 }
 
   void applyLinearImpulse(PVector force) {
@@ -70,18 +68,4 @@ class PhysicsBody {
     }
   }
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-
 }

@@ -10,7 +10,8 @@ void setup(){
   walls.add(new Segment(new PVector(0,height),new PVector(width,height)));
   walls.add(new Segment(new PVector(width,0),new PVector(width,height)));
   walls.add(new Segment(new PVector(),new PVector(width,0)));
-  //walls.add(new Segment(new PVector(100,50),new PVector(200,250)));
+  walls.add(new Segment(new PVector(100,50),new PVector(200,250)));
+  frameRate(120);
 }
 
 void draw(){
@@ -20,7 +21,7 @@ void draw(){
     b.collideWithSegment(s);
     s.draw();
   }
-  //b.gravity();
+  //b.gravity(); // ar eita shobcheye weirdest simulation, shobkisu messed up // bruh
   b.update();
   b.draw();
 }

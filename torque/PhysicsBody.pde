@@ -56,7 +56,8 @@ class PhysicsBody {
     push();
     translate(position.x,position.y);
     PVector r = PVector.fromAngle(angle).mult(radius);
-    PVector torque = r.cross(force);
+    PVector torque = r.cross(force); // eikhane kisu limitation ase, karon 2D te sphere bole to kisu nai, eita ekta 
+    // disk, ejonno torque ta apply hobe shobshomoy disk er outer most edge e, angle ta oitai define kore
     angularAcceleration.add(torque.div(inertia));
     pop();
  }
